@@ -83,6 +83,10 @@ M-x load-file RET ~/.emacs.d/init.el RET
 ```elisp
 (setq mooerslab-paper-tagger-max-tags 5)        ; Number of tags to extract
 (setq mooerslab-paper-tagger-python-command "python3")  ; Python command
+(setq mooerslab-paper-tagger-default-pdf-path "~/0papersLabeled")  ; default directory holding 1,000s of PDFs of papers
+
+;; To choose a different directory,
+C-u M-x mooerslab-tag-papers-in-region
 ```
 
 ## Update history
