@@ -7,6 +7,7 @@
 ## Objective
 
 Automate the generation and addition of tags to PDF files whose names are in a selected region in a buffer inside of Emacs.
+This only works on MacOS.
 
 ## Status
 
@@ -64,9 +65,9 @@ M-x mooerslab-extract-paper-keywords
 
 ```elisp
 ;; 1. Save the file to a directory, e.g.,
-```bash
-git clone ~/.emacs.d/manual-packages/mooerslab-paper-auto-tagger-el/
-```
+
+git clone https://github.com/MooersLab/mooerslab-paper-auto-tagger-el.git ~/.emacs.d/manual-packages/mooerslab-paper-auto-tagger-el
+
 ;; 2. Add to your init.el or .emacs:
 (add-to-list 'load-path "~/.emacs.d/manual-packages/mooerslab-paper-auto-tagger-el/")
 (require 'mooerslab-paper-auto-tagger)
