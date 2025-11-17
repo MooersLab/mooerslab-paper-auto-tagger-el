@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/static/v1?label=mooerslab-pdf-auto-tagger-el&message=0.1&color=brightcolor)
+![Version](https://img.shields.io/static/v1?label=mooerslab-pdf-auto-tagger-el&message=0.2&color=brightcolor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -7,11 +7,23 @@
 ## Objective
 
 Automate the generation and addition of tags to PDF files whose names are in a selected region in a buffer inside of Emacs.
-This only works on MacOS.
+
+## Problem addressed
+
+The manual addition of tags to PDF files is time-consuming and error prone.
+
+
+## Scope
+
+- This only works on MacOS which supports the addition of tags to files.
+- Install the **tag** program with homebrew to search for PDF files that share the same tag. (i.e., `brew install tag`)
+- Differs from *mooerslab-pdf-auto-tagger* in that it can read the keywords and abstract of the paper to search for tags.
+These are two features that are missing from books.
+- Works only on a list of PDF filenames, not the entire directory, so that you can use ripgrep or other fuzzy search tools to gather related papers. You can then use the Finder or the **tag** program to add a unifying tag to all of the files (e.g., `tag -a "MyTag" file1.txt file2.txt file3.pdf`. This package can then be used to add additional tags. 
 
 ## Status
 
-Works okay. Provides a starting point. You may want to manually delete the less meaningful tags the next time that you are reading the file.
+Provides an initial draft of tags. You may want to manually delete the less meaningful tags the next time that you are reading the file.
 
 ## Main Functions:
 
