@@ -46,12 +46,42 @@ M-x mooerslab-tag-papers-in-region
 M-x mooerslab-extract-paper-keywords
 ```
 
+## Quick try
+
+```elisp
+;; 1. Save the code to a file
+;; 2. In Emacs, run:
+M-: (load-file "~/path/to/mooerslab-paper-auto-tagger.el")
+
+;; 3. Test it works:
+M-x mooerslab-extract-paper-keywords
+```
+
+## Permanent config
+
+```elisp
+;; 1. Save the file to a directory, e.g.,
+```bash
+git clone ~/.emacs.d/manual-packages/mooerslab-paper-auto-tagger-el/
+```
+;; 2. Add to your init.el or .emacs:
+(add-to-list 'load-path "~/.emacs.d/manual-packages/mooerslab-paper-auto-tagger-el/")
+(require 'mooerslab-paper-auto-tagger)
+
+;; 3. Restart Emacs or evaluate the init file:
+M-x eval-buffer RET  ; while in init.el
+;; Or
+M-x load-file RET ~/.emacs.d/init.el RET
+```
+
+
 
 ## Update history
 
-|Version      | Changes                                                                                                                                                                         | Date                 |
-|:-----------|:------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------|
-| Version 0.1 |   Added badges, funding, and update table.  Initial commit.                                                                                        | 11/16/2025  |
+|Version      | Changes                                                                                                 | Date                |
+|:-----------|:---------------------------------------------------------------------------------------------------------|:--------------------|
+| Version 0.1 |   Added badges, funding, and update table.  Initial commit.                                             | 11/16/2025          |
+| Version 0.2 |   Added installation instructions.  
 
 ## Sources of funding
 
