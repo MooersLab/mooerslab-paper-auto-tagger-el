@@ -10,7 +10,7 @@
 ;; Author: blaine-mooers@ou.edu
 ;; Maintainer: blaine-mooers@ou.edu
 ;; URL: https://github.com/MooersLab/mooerslab-pdf-auto-tagger-el
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: pdf, tags, automation, MacOS
 ;; License: MIT
 ;; Updated 2025 November 16
@@ -18,6 +18,11 @@
 ;;; Code:
 
 (require 'json)
+
+(defgroup mooerslab-paper-tagger nil
+  "Automatically tag research paper PDFs with extracted keywords."
+  :group 'files
+  :prefix "mooerslab-paper-tagger-")
 
 (defcustom mooerslab-paper-tagger-python-command "python3"
   "Command to invoke Python 3."
@@ -33,6 +38,13 @@
   "OCR backend to use. Options: tesseract, pdftotext."
   :type '(choice (const :tag "Tesseract OCR" tesseract)
                  (const :tag "PDFtotext" pdftotext))
+  :group 'mooerslab-paper-tagger)
+
+(defcustom mooerslab-paper-tagger-default-pdf-path "~/Documents/papers"
+  "Default path to directory containing PDF files to be tagged.
+This path will be used by default when running tagging commands,
+but can be overridden with a prefix argument."
+  :type 'directory
   :group 'mooerslab-paper-tagger)
 
 (defvar mooerslab-paper-tagger-python-script
@@ -305,39 +317,39 @@ if __name__ == '__main__':
       (user-error "Missing dependencies: %s" (string-join missing ", ")))
     t))
 
-    (defun mooerslab-paper-tagger--extract-keywords-python (pdf-path)
-      "Extract keywords from PDF-PATH using Python script.
-    Returns a plist with :keywords, :method, and :error keys."
-      (let* ((temp-script (make-temp-file "paper-tagger" nil ".py"))
-             result)
-        (unwind-protect
-            (progn
-              ;; Write Python script to temp file
-              (with-temp-file temp-script
-                (insert mooerslab-paper-tagger-python-script))
+(defun mooerslab-paper-tagger--extract-keywords-python (pdf-path)
+  "Extract keywords from PDF-PATH using Python script.
+Returns a plist with :keywords, :method, and :error keys."
+  (let* ((temp-script (make-temp-file "paper-tagger" nil ".py"))
+         result)
+    (unwind-protect
+        (progn
+          ;; Write Python script to temp file
+          (with-temp-file temp-script
+            (insert mooerslab-paper-tagger-python-script))
           
-              ;; Make file executable using chmod
-              (set-file-modes temp-script #o755)
+          ;; Make file executable using chmod
+          (set-file-modes temp-script #o755)
           
-              ;; Execute Python script
-              (let* ((output (shell-command-to-string
-                             (format "%s %s '%s' %d 2>&1"
-                                    mooerslab-paper-tagger-python-command
-                                    (shell-quote-argument temp-script)
-                                    pdf-path
-                                    mooerslab-paper-tagger-max-tags)))
-                     (parsed (condition-case err
-                                (json-read-from-string output)
-                              (error
-                               (message "Error parsing JSON: %s\nOutput: %s" err output)
-                               nil))))
-                (when parsed
-                  (setq result (list :keywords (append (cdr (assoc 'keywords parsed)) nil)
-                                   :method (cdr (assoc 'method parsed))
-                                   :error (cdr (assoc 'error parsed)))))))
-          ;; Clean up temp file
-          (delete-file temp-script))
-        result))
+          ;; Execute Python script
+          (let* ((output (shell-command-to-string
+                         (format "%s %s '%s' %d 2>&1"
+                                mooerslab-paper-tagger-python-command
+                                (shell-quote-argument temp-script)
+                                pdf-path
+                                mooerslab-paper-tagger-max-tags)))
+                 (parsed (condition-case err
+                            (json-read-from-string output)
+                          (error
+                           (message "Error parsing JSON: %s\nOutput: %s" err output)
+                           nil))))
+            (when parsed
+              (setq result (list :keywords (append (cdr (assoc 'keywords parsed)) nil)
+                               :method (cdr (assoc 'method parsed))
+                               :error (cdr (assoc 'error parsed)))))))
+      ;; Clean up temp file
+      (delete-file temp-script))
+    result))
 
 (defun mooerslab-paper-tagger--apply-tags-macos (filepath tags)
   "Apply TAGS to FILEPATH using macOS tag command, preserving existing tags.
@@ -361,9 +373,12 @@ Returns a list of tag strings."
         (split-string output "\n" t)))))
 
 ;;;###autoload
-(defun mooerslab-tag-papers-in-region (path-to-files)
+(defun mooerslab-tag-papers-in-region (&optional path-to-files)
   "Tag research paper PDFs listed in region with automatically extracted keywords.
 PATH-TO-FILES is the directory path where the PDF files are located.
+If not provided or called with prefix argument (\\[universal-argument]), 
+prompts for the directory. Otherwise uses `mooerslab-paper-tagger-default-pdf-path'.
+
 Each line in the region should contain a PDF filename.
 
 The function will:
@@ -375,13 +390,23 @@ The function will:
 Requires macOS with 'tag' command and Python 3.
 Recommended: pdftotext (poppler-utils) for better text extraction.
 Optional: spaCy for better keyword extraction (pip install spacy)."
-  (interactive "DPath to PDF files: ")
+  (interactive
+   (list (if current-prefix-arg
+             (read-directory-name "Path to PDF files: ")
+           mooerslab-paper-tagger-default-pdf-path)))
   
   ;; Check dependencies
   (mooerslab-paper-tagger--check-dependencies)
   
   (unless (use-region-p)
     (user-error "No region selected"))
+  
+  ;; Expand tilde in path
+  (setq path-to-files (expand-file-name path-to-files))
+  
+  ;; Check if directory exists
+  (unless (file-directory-p path-to-files)
+    (user-error "Directory does not exist: %s" path-to-files))
   
   (let* ((start (region-beginning))
          (end (region-end))
@@ -391,7 +416,7 @@ Optional: spaCy for better keyword extraction (pip install spacy)."
          (failure-count 0)
          (total (length lines)))
     
-    (message "Processing %d papers..." total)
+    (message "Processing %d papers from %s..." total path-to-files)
     
     (dolist (line lines)
       (let* ((filename (string-trim line))
@@ -446,6 +471,7 @@ Optional: spaCy for better keyword extraction (pip install spacy)."
         (erase-buffer)
         (insert (format "Research Paper Tagging Summary\n"))
         (insert (format "================================\n\n"))
+        (insert (format "PDF Directory: %s\n" path-to-files))
         (insert (format "Total papers: %d\n" total))
         (insert (format "Successfully tagged: %d\n" success-count))
         (insert (format "Failed: %d\n\n" failure-count))
