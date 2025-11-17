@@ -19,7 +19,9 @@ The manual addition of tags to PDF files is time-consuming and error prone.
 - Install the **tag** program with homebrew to search for PDF files that share the same tag. (i.e., `brew install tag`)
 - Differs from *mooerslab-pdf-auto-tagger* in that it can read the keywords and abstract of the paper to search for tags.
 These are two features that are missing from books.
-- Works only on a list of PDF filenames, not the entire directory, so that you can use ripgrep or other fuzzy search tools to gather related papers. You can then use the Finder or the **tag** program to add a unifying tag to all of the files (e.g., `tag -a "MyTag" file1.txt file2.txt file3.pdf`. This package can then be used to add additional tags. 
+- Works only on a list of PDF filenames, not the entire directory.
+- You can use **rga** (ripgrep-all, which extends ripgrep to search inside PDFs, Office docs, eBooks, etc. Then you can combine it with fzf for fuzzy matching and interactive selection. Install with homebrew: `brew install ripgrep-all fzf`.) to gather related papers (e.g., rga --files-with-matches "your search term" *.pdf).
+- You can then use the Finder or the **tag** program to add a unifying tag to all of the files (e.g., `tag -a "MyTag" file1.txt file2.txt file3.pdf`. This package can then be used to add additional tags. 
 
 ## Status
 
