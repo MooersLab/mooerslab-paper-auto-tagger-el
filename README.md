@@ -8,6 +8,10 @@
 
 Automate the generation and addition of tags to PDF files whose names are in a selected region in a buffer inside of Emacs.
 
+## Status
+
+Works okay. Provides a starting point. You may want to manually delete the less meaningful tags the next time that you are reading the file.
+
 ## Main Functions:
 
 - *mooerslab-tag-papers-in-region*: Tag all PDFs listed in a region.
@@ -15,11 +19,10 @@ Automate the generation and addition of tags to PDF files whose names are in a s
 
 ## Features
 
-- Preserves existing tags (appends new ones)
-- Multiple extraction methods with automatic fallback
-- Detailed progress reporting
-- Comprehensive summary buffer
-- Support for multiple PDF text extraction tools
+- Preserves existing tags (appends new ones).
+- Displays a detailed summary showing which papers were successfully tagged, which extraction method was used, and any errors encountered.
+- Support for multiple PDF text extraction tools.
+- Customizable features.
 
 ## Dependencies
 ```python
@@ -74,14 +77,19 @@ M-x eval-buffer RET  ; while in init.el
 M-x load-file RET ~/.emacs.d/init.el RET
 ```
 
+## Customizations
 
+```elisp
+(setq mooerslab-paper-tagger-max-tags 5)        ; Number of tags to extract
+(setq mooerslab-paper-tagger-python-command "python3")  ; Python command
+```
 
 ## Update history
 
 |Version      | Changes                                                                                                 | Date                |
 |:-----------|:---------------------------------------------------------------------------------------------------------|:--------------------|
 | Version 0.1 |   Added badges, funding, and update table.  Initial commit.                                             | 11/16/2025          |
-| Version 0.2 |   Added installation instructions.  
+| Version 0.2 |   Added installation instructions.  Added path to PDFs as a customizalbe variable.                      | 11/17/2025          |
 
 ## Sources of funding
 
